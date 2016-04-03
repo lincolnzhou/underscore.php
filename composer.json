@@ -1,0 +1,12 @@
+{
+    "name": "lincolnzhou/underscore.php",
+    "description": "underscore.php",
+    "authors": [
+        {
+            "name": "LincolnZhou",
+            "email": "875199116@qq.com"
+        }
+    ],
+    "require": {
+    }
+}

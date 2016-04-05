@@ -165,5 +165,12 @@ class CollectionsTest extends PHPUnit_Framework_TestCase {
             array('name' => 'test2', 'email' => '3@qq.com'),
         );
         $this->assertEquals(array('test', 'test1', 'test2'), __::pluck($arr, 'name'));
+
+        $arr = array(
+            array('name' => 'test', 'email' => '1@qq.com'),
+            array('name' => 'test1', 'email' => '2@qq.com'),
+            array('name' => 'test2', 'email' => '3@qq.com'),
+        );
+        $this->assertEquals(array('test', 'test1', 'test2'), __($arr)->pluck('name'));
     }
 }

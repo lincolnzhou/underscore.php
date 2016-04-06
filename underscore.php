@@ -241,6 +241,23 @@ class __
     }
 
     /**
+     * 判断集合是否包含指定值
+     * includ alias contains
+     * @param null $collection 集合
+     * @param null $value 指定值
+     * @return null
+     */
+    public function contains($collection = null, $value = null) { return self::includ($collection, $value); }
+    public function includ($collection = null, $value = null)
+    {
+        list($collection, $value) = self::_wrapArgs(func_get_args(), 2);
+
+        $collection = (array)self::_collection($collection);
+
+        return self::_wrap(array_search($value, $collection, true));
+    }
+
+    /**
      *
      * @param null $collection
      * @param null $functionName
@@ -272,21 +289,28 @@ class __
         return $return;
     }
 
-    /**
-     * 判断集合是否包含指定值
-     * includ alias contains
-     * @param null $collection 集合
-     * @param null $value 指定值
-     * @return null
-     */
-    public function contains($collection = null, $value = null) { return self::includ($collection, $value); }
-    public function includ($collection = null, $value = null)
+    public function max($collection = null, $iterator = null)
     {
-        list($collection, $value) = self::_wrapArgs(func_get_args(), 2);
 
-        $collection = (array)self::_collection($collection);
+    }
 
-        return self::_wrap(array_search($value, $collection, true));
+    /**
+     * 获取数组的第一个元素，若存在参数n返回前n个元素
+     * @param null $collection 集合
+     * @param null $n 前n个元素
+     * @return mixed
+     */
+    public function head($collection = null, $n = null) { return self::first($collection, $n); }
+    public function first($collection = null, $n = null)
+    {
+        list($collection, $n) = self::_wrapArgs(func_get_args(), 2);
+
+        $collection = self::_collection($collection);
+
+        if ($n == 0) return self::_wrap(array());
+        var_dump(current(array_slice($collection, 0, 1)));
+        if (is_null($n)) return self::_wrap(current(array_slice($collection, 0, 1)));
+        return self::_wrap(array_slice($collection, 0, $n, true));
     }
 
     /**

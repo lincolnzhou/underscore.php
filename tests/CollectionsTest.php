@@ -173,4 +173,9 @@ class CollectionsTest extends PHPUnit_Framework_TestCase {
         );
         $this->assertEquals(array('test', 'test1', 'test2'), __($arr)->pluck('name'));
     }
+
+    public function testFirst()
+    {
+
+    }
 }

@@ -8,8 +8,8 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true">
     <logging>
-        <log type="coverage-html" target="../coverage" lowUpperBound="35"
-             highLowerBound="70"/>
+        <!--<log type="coverage-html" target="../coverage" lowUpperBound="35"-->
+             <!--highLowerBound="70"/>-->
     </logging>
 
 </phpunit>

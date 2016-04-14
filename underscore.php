@@ -291,6 +291,25 @@ class __
 
     public function max($collection = null, $iterator = null)
     {
+        list($collection, $iterator) = self::_wrapArgs(func_get_args(), 2);
+
+        if (is_null($iterator)) return self::_wrap(max($collection));
+
+        $results = array();
+        foreach ($collection as $key => $item) {
+            $results[$key] = $iterator($item);
+        }
+
+        arsort($results);
+
+        $__ = new self();
+        $first_key = $__->first(array_keys($results));
+
+        return $collection[$first_key];
+    }
+
+    public function min($collection = null, $iterator = null)
+    {
 
     }
 
@@ -306,10 +325,9 @@ class __
         list($collection, $n) = self::_wrapArgs(func_get_args(), 2);
 
         $collection = self::_collection($collection);
-
-        if ($n == 0) return self::_wrap(array());
-        var_dump(current(array_slice($collection, 0, 1)));
+        if ($n === 0) return self::_wrap(array());
         if (is_null($n)) return self::_wrap(current(array_slice($collection, 0, 1)));
+
         return self::_wrap(array_slice($collection, 0, $n, true));
     }
 

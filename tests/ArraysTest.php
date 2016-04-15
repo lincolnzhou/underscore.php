@@ -16,4 +16,10 @@ class ArraysTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(3, __::max(array(1,2,3)), 'can perform a regular max');
         $this->assertEquals(1, __::max(array(1,2,3), function($num) { return -$num; }), 'can performa a computation-based max');
     }
+
+    public function testMin() {
+        // from js
+        $this->assertEquals(1, __::min(array(1,2,3)), 'can perform a regular min');
+        $this->assertEquals(3, __::min(array(1,2,3), function($num) { return -$num; }), 'can performa a computation-based max');
+    }
 }

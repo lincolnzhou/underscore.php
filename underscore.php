@@ -289,6 +289,12 @@ class __
         return $return;
     }
 
+    /**
+     * 返回最大值
+     * @param null $collection 集合
+     * @param null $iterator 迭代器
+     * @return mixed
+     */
     public function max($collection = null, $iterator = null)
     {
         list($collection, $iterator) = self::_wrapArgs(func_get_args(), 2);
@@ -308,9 +314,29 @@ class __
         return $collection[$first_key];
     }
 
+    /**
+     * 返回最小值
+     * @param null $collection 集合
+     * @param null $iterator 迭代器
+     * @return mixed
+     */
     public function min($collection = null, $iterator = null)
     {
+        list($collection, $iterator) = self::_wrapArgs(func_get_args(), 2);
 
+        if (is_null($iterator)) return self::_wrap(min($collection));
+
+        $results = array();
+        foreach ($collection as $key => $item) {
+            $results[$key] = $iterator($item);
+        }
+
+        asort($results);
+
+        $__ = new self();
+        $first_key = $__->first(array_keys($results));
+
+        return $collection[$first_key];
     }
 
     /**

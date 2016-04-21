@@ -54,7 +54,11 @@ class __
      * @param null $iterator 迭代器
      * @return array|mixed
      */
-    public function collect($collection = null, $iterator = null) { return self::map($collection, $iterator); }
+    public function collect($collection = null, $iterator = null)
+    {
+        return self::map($collection, $iterator);
+    }
+
     public function map($collection = null, $iterator = null)
     {
         list($collection, $iterator) = self::_wrapArgs(func_get_args(), 2);
@@ -82,8 +86,16 @@ class __
      * @return mixed
      * @throws Exception
      */
-    public function foldl($collection = null, $iterator = null, $memo = null) { return self::reduce($collection, $iterator, $memo); }
-    public function inject($collection = null, $iterator = null, $memo = null) { return self::reduce($collection, $iterator, $memo); }
+    public function foldl($collection = null, $iterator = null, $memo = null)
+    {
+        return self::reduce($collection, $iterator, $memo);
+    }
+
+    public function inject($collection = null, $iterator = null, $memo = null)
+    {
+        return self::reduce($collection, $iterator, $memo);
+    }
+
     public function reduce($collection = null, $iterator = null, $memo = null)
     {
         list($collection, $iterator, $memo) = self::_wrapArgs(func_get_args(), 3);
@@ -108,7 +120,11 @@ class __
      * @return mixed
      * @throws Exception
      */
-    public function foldr($collection = null, $iterator = null, $memo = null) { return self::reduceRight($collection, $iterator, $memo); }
+    public function foldr($collection = null, $iterator = null, $memo = null)
+    {
+        return self::reduceRight($collection, $iterator, $memo);
+    }
+
     public function reduceRight($collection = null, $iterator = null, $memo = null)
     {
         list($collection, $iterator, $memo) = self::_wrapArgs(func_get_args(), 3);
@@ -136,7 +152,11 @@ class __
      * @param null $iterator 迭代器
      * @return mixed
      */
-    public function detect($collection = null, $iterator = null) { return self::find($collection, $iterator); }
+    public function detect($collection = null, $iterator = null)
+    {
+        return self::find($collection, $iterator);
+    }
+
     public function find($collection = null, $iterator = null)
     {
         list($collection, $iterator) = self::_wrapArgs(func_get_args(), 2);
@@ -144,7 +164,9 @@ class __
         $collection = self::_collection($collection);
 
         foreach ($collection as $value) {
-            if (call_user_func($iterator, $value)) { return $value; }
+            if (call_user_func($iterator, $value)) {
+                return $value;
+            }
         }
 
         return self::_wrap(false);
@@ -157,7 +179,11 @@ class __
      * @param null $iterator 迭代器
      * @return mixed
      */
-    public function select($collection = null, $iterator = null) { return self::filter($collection, $iterator); }
+    public function select($collection = null, $iterator = null)
+    {
+        return self::filter($collection, $iterator);
+    }
+
     public function filter($collection = null, $iterator = null)
     {
         list($collection, $iterator) = self::_wrapArgs(func_get_args(), 2);
@@ -166,7 +192,9 @@ class __
 
         $return = array();
         foreach ($collection as $value) {
-            if (call_user_func($iterator, $value)) { $return[] = $value; }
+            if (call_user_func($iterator, $value)) {
+                $return[] = $value;
+            }
         }
 
         return self::_wrap($return);
@@ -186,7 +214,9 @@ class __
 
         $return = array();
         foreach ($collection as $value) {
-            if (!call_user_func($iterator, $value)) { $return[] = $value; }
+            if (!call_user_func($iterator, $value)) {
+                $return[] = $value;
+            }
         }
 
         return self::_wrap($return);
@@ -199,7 +229,11 @@ class __
      * @param null $iterator 迭代器
      * @return bool
      */
-    public function every($collection = null, $iterator = null) { return self::all($collection, $iterator); }
+    public function every($collection = null, $iterator = null)
+    {
+        return self::all($collection, $iterator);
+    }
+
     public function all($collection = null, $iterator = null)
     {
         list($collection, $iterator) = self::_wrapArgs(func_get_args(), 2);
@@ -247,7 +281,11 @@ class __
      * @param null $value 指定值
      * @return null
      */
-    public function contains($collection = null, $value = null) { return self::includ($collection, $value); }
+    public function contains($collection = null, $value = null)
+    {
+        return self::includ($collection, $value);
+    }
+
     public function includ($collection = null, $value = null)
     {
         list($collection, $value) = self::_wrapArgs(func_get_args(), 2);
@@ -263,7 +301,9 @@ class __
      * @param null $functionName
      * @TODO
      */
-    public function invoke($collection = null, $functionName = null) {}
+    public function invoke($collection = null, $functionName = null)
+    {
+    }
 
     /**
      * 返回指定属性的值
@@ -340,6 +380,120 @@ class __
     }
 
     /**
+     * 分组统计
+     * @param null $collection 集合
+     * @param null $iterator 迭代器
+     * @return mixed
+     */
+    public function groupBy($collection = null, $iterator = null)
+    {
+        list($collection, $iterator) = self::_wrapArgs(func_get_args(), 2);
+
+        $result = array();
+        $collection = (array)$collection;
+        foreach ($collection as $k => $v) {
+            $key = is_callable($iterator) ? $iterator($v, $k) : $v[$iterator];
+            if (!array_key_exists($key, $result)) {
+                $result[$key] = array();
+            }
+
+            $result[$key][] = $v;
+        }
+
+        return self::_wrap($result);
+    }
+
+    /**
+     * 排序
+     * @param null $collection 集合
+     * @param null $iterator 前n个元素
+     * @return mixed
+     */
+    public function sortBy($collection = null, $iterator = null)
+    {
+        list($collection, $iterator) = self::_wrapArgs(func_get_args(), 2);
+
+        $result = array();
+        foreach ($collection as $k => $v) {
+            $result[$k] = $iterator($v);
+        }
+
+        asort($result);
+        foreach ($result as $k => $v) {
+            $result[$k] = $collection[$k];
+        }
+
+        return self::_wrap(array_values($result));
+    }
+
+    /**
+     * 返回插入的位置
+     * @param null $collection 集合
+     * @param null $value 插入值
+     * @param null $iterator 前n个元素
+     * @return mixed
+     */
+    public function sortedIndex($collection = null, $value = null, $iterator = null)
+    {
+        list($collection, $value, $iterator) = self::_wrapArgs(func_get_args(), 3);
+
+        $collection = (array)self::_collection($collection);
+        $calculated_value = (!is_null($iterator)) ? $iterator($value) : $value;
+
+        while(count($collection) > 1) {
+            $midpoint = floor(count($collection) / 2);
+            $midpoint_values = array_slice($collection, $midpoint, 1);
+            $midpoint_value = $midpoint_values[0];
+            $midpoint_calculated_value = (!is_null($iterator)) ? $iterator($midpoint_value) : $midpoint_value;
+            $collection = $calculated_value < $midpoint_calculated_value ? array_slice($collection, 0, $midpoint, true) : array_slice($collection, $midpoint, null, true);
+        }
+
+        $keys = array_keys($collection);
+
+        return self::_wrap(current($keys) + 1);
+    }
+
+    /**
+     * 打乱集合
+     * @param null $collection 集合
+     * @return mixed
+     */
+    public function shuffle($collection = null)
+    {
+        list($collection) = self::_wrapArgs(func_get_args(), 1);
+
+        $collection = (array)self::_collection($collection);
+
+        shuffle($collection);
+
+        return $this->_wrap($collection);
+    }
+
+    /**
+     * 转化为数组
+     * @param null $collection 集合
+     * @return array
+     */
+    public function toArray($collection = null)
+    {
+        return (array)$collection;
+    }
+
+    /**
+     * 计算集合大小
+     * @param null $collection
+     * @return mixed
+     */
+    public function size($collection = null)
+    {
+        list($collection) = self::_wrapArgs(func_get_args(), 1);
+
+        $collection = self::_collection($collection);
+
+        return self::_wrap(count((array)$collection));
+    }
+
+    /**
      * 获取数组的第一个元素，若存在参数n返回前n个元素
      * @param null $collection 集合
      * @param null $n 前n个元素
@@ -355,6 +509,84 @@ class __
         if (is_null($n)) return self::_wrap(current(array_slice($collection, 0, 1)));
 
         return self::_wrap(array_slice($collection, 0, $n, true));
+    }
+
+    /**
+     * 返回数组中除了最后一个元素外的其他全部元素。 在arguments对象上特别有用。传递 n参数将从结果中排除从最后一个开始的n个元素（注：排除数组后面的 n 个元素）。
+     * @param null $collection 集合
+     * @param null $n n
+     * @return mixed
+     */
+    public function initial($collection = null, $n = null)
+    {
+        list($collection, $n) = self::_wrapArgs(func_get_args(), 2);
+
+        $collection = (array)self::_collection($collection);
+
+        if (is_null($n)) $n = 1;
+        $first_index = count($collection) - $n;
+
+        $__ = new self();
+
+        return self::_wrap($__::first($collection, $first_index));
+    }
+
+    /**
+     * 返回数组中除了第一个元素外的其他全部元素。传递 index 参数将返回从index开始的剩余所有元素
+     * @param null $collection 集合
+     * @param null $n n
+     * @return mixed
+     */
+    public function tail($collection = null, $n = null) { return self::rest($collection, $n); }
+    public function rest($collection = null, $n = null)
+    {
+        list($collection, $n) = self::_wrapArgs(func_get_args(), 2);
+
+        $collection = (array)self::_collection($collection);
+
+        if (is_null($n)) $n = 1;
+
+        return self::_wrap(array_slice($collection, $n));
+    }
+
+    /**
+     * 返回array（数组）的最后一个元素。传递 n参数将返回数组中从最后一个元素开始的n个元素（注：返回数组里的后面的n个元素）
+     * @param null $collection 集合
+     * @param null $n n
+     * @return mixed
+     */
+    public function last($collection = null, $n = null)
+    {
+        list($collection, $n) = self::_wrapArgs(func_get_args(), 2);
+
+        $collection = (array)self::_collection($collection);
+
+        if ($n === 0) $result = array();
+        elseif ($n === 1 || is_null($n)) $result = array_pop($collection);
+        else {
+            $__ = new self();
+            $result = $__::rest($collection, -$n);
+        }
+
+        return self::_wrap($result);
+    }
+
+    /**
+     * 返回一个除去所有false值的 array副本
+     * @param null $collection 集合
+     * @return mixed
+     */
+    public function compact($collection = null)
+    {
+        list($collection) = self::_wrapArgs(func_get_args(), 1);
+
+        $collection = self::_collection($collection);
+
+        $__ = new self();
+
+        return self::_wrap($__::select($collection, function ($num) {
+            return (bool)$num;
+        }));
     }
 
     /**

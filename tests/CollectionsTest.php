@@ -174,8 +174,58 @@ class CollectionsTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array('test', 'test1', 'test2'), __($arr)->pluck('name'));
     }
 
-    public function testFirst()
+    public function testGroupBy()
     {
+        $parity = __::groupBy(array(1, 2, 3, 4, 5, 6), function ($num) { return $num % 2; });
+        $this->assertEquals(array(array(2, 4, 6), array(1, 3, 5)), $parity, 'created a group for each value');
 
+        $parity = __(array(1, 2, 3, 4, 5, 6))->groupBy(function ($num) { return $num % 2; });
+        $this->assertEquals(array(array(2, 4, 6), array(1, 3, 5)), $parity, 'created a group for each value');
+
+        $vals = array(
+            array('name'=>'rejected', 'yesno'=>'no'),
+            array('name'=>'accepted', 'yesno'=>'yes'),
+            array('name'=>'allowed', 'yesno'=>'yes'),
+            array('name'=>'denied', 'yesno'=>'no')
+        );
+        $grouped = __::groupBy($vals, 'yesno');
+        $this->assertEquals(
+            array(
+                'no' =>  array(array('name'=>'rejected', 'yesno'=>'no'), array('name'=>'denied', 'yesno'=>'no')),
+                'yes' =>  array(array('name'=>'accepted', 'yesno'=>'yes'), array('name'=>'allowed', 'yesno'=>'yes'))
+            ),
+            $grouped
+        );
+    }
+
+    public function testSortBy()
+    {
+        $people = array(
+            (object) array('name'=>'curly', 'age'=>50),
+            (object) array('name'=>'moe', 'age'=>30)
+        );
+        $people_sorted = __::sortBy($people, function($person) { return $person->age; });
+        $this->assertEquals(array('moe', 'curly'), __::pluck($people_sorted, 'name'), 'stooges sorted by age');
+    }
+
+    public function testSortedIndex()
+    {
+        $this->assertEquals(6, __::sortedIndex(array(1, 5, 8, 11, 16, 20, 30), 24));
+    }
+
+    public function testToArray()
+    {
+        $student = new StdClass;
+        $student->age = 11;
+        $student->name = 'LincolnZhou';
+        $this->assertEquals(array('age' => 11, 'name' => 'LincolnZhou'), __::toArray($student));
+    }
+
+    public function testSize()
+    {
+        $student = new StdClass;
+        $student->age = 11;
+        $student->name = 'LincolnZhou';
+        $this->assertEquals(2, __::size($student));
     }
 }

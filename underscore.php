@@ -440,7 +440,7 @@ class __
         $collection = (array)self::_collection($collection);
         $calculated_value = (!is_null($iterator)) ? $iterator($value) : $value;
 
-        while(count($collection) > 1) {
+        while (count($collection) > 1) {
             $midpoint = floor(count($collection) / 2);
             $midpoint_values = array_slice($collection, $midpoint, 1);
             $midpoint_value = $midpoint_values[0];
@@ -499,7 +499,11 @@ class __
      * @param null $n 前n个元素
      * @return mixed
      */
-    public function head($collection = null, $n = null) { return self::first($collection, $n); }
+    public function head($collection = null, $n = null)
+    {
+        return self::first($collection, $n);
+    }
+
     public function first($collection = null, $n = null)
     {
         list($collection, $n) = self::_wrapArgs(func_get_args(), 2);
@@ -537,7 +541,11 @@ class __
      * @param null $n n
      * @return mixed
      */
-    public function tail($collection = null, $n = null) { return self::rest($collection, $n); }
+    public function tail($collection = null, $n = null)
+    {
+        return self::rest($collection, $n);
+    }
+
     public function rest($collection = null, $n = null)
     {
         list($collection, $n) = self::_wrapArgs(func_get_args(), 2);
@@ -587,6 +595,141 @@ class __
         return self::_wrap($__::select($collection, function ($num) {
             return (bool)$num;
         }));
+    }
+
+    /**
+     * 将一个嵌套多层的数组 array（数组） (嵌套可以是任何层数)转换为只有一层的数组。 如果你传递 shallow参数，数组将只减少一维的嵌套。
+     * @param null $collection 集合
+     * @param null $shallow 是否只减少一维
+     * @return mixed
+     */
+    public function flatten($collection = null, $shallow = null)
+    {
+        list($collection, $shallow) = self::_wrapArgs(func_get_args(), 2);
+
+        $collection = self::_collection($collection);
+
+        $result = array();
+        foreach ($collection as $item) {
+            if (is_array($item)) {
+                $__ = new self();
+                $result = array_merge($result, $shallow ? $item : $__::flatten($item));
+            } else {
+                $result[] = $item;
+            }
+        }
+
+        return self::_wrap($result);
+    }
+
+    /**
+     * 返回一个删除所有values值后的 array副本
+     * @param null $collection
+     * @param null $values
+     * @return mixed
+     */
+    public function without($collection = null, $values = null)
+    {
+        $args = self::_wrapArgs(func_get_args(), 1);
+        $collection = $args[0];
+        $collection = self::_collection($collection);
+
+        $num_args = count($args);
+        if ($num_args === 1) return self::_wrap($collection);
+        if (count($num_args) === 0) return self::_wrap($collection);
+
+        $__ = new self();
+        $values = $__::rest($args);
+        foreach ($values as $value) {
+            $remove_keys = array_keys($collection, $value, true);
+            foreach ($remove_keys as $remove_key) {
+                unset($collection[$remove_key]);
+            }
+        }
+
+        return self::_wrap($collection);
+    }
+
+    /**
+     * 返回 array去重后的副本, 使用 === 做相等测试. 如果您确定 array 已经排序, 那么给 isSorted并没有影响(跟underscore.js不同). 如果要处理对象元素, 传参 iterator 来获取要对比的属性.
+     * @param null $collection
+     * @param null $isSorted
+     * @param null $iterator
+     * @return mixed
+     */
+    public function unique($collection = null, $isSorted = null, $iterator = null)
+    {
+        return self::uniq($collection, $isSorted, $iterator);
+    }
+
+    public function uniq($collection = null, $isSorted = null, $iterator = null)
+    {
+        list($collection, $isSorted, $shallow) = self::_wrapArgs(func_get_args(), 3);
+
+        $collection = self::_collection($collection);
+        if (count($collection) === 0) return self::_wrap(array());
+
+        $result = array();
+        $calculated = array();
+        foreach ($collection as $item) {
+            $value = !is_null($iterator) ? $iterator($item) : $item;
+            if (is_bool(array_search($value, $calculated, true))) {
+                $calculated[] = $value;
+                $result[] = $value;
+            }
+        }
+
+        return self::_wrap($result);
+    }
+
+    /**
+     * 合并多个数组
+     * @param null $array
+     * @return mixed
+     */
+    public function union($array = null)
+    {
+        $arrays = self::_wrapArgs(func_get_args(), 1);
+
+        if (count($arrays) === 1) return self::_wrap($arrays);
+
+        return self::_wrap(array_values(array_unique(call_user_func_array('array_merge', $arrays))));
+    }
+
+    /**
+     * 交集
+     * @param null $array
+     * @return mixed
+     */
+    public function intersection($array = null)
+    {
+        $arrays = self::_wrapArgs(func_get_args(), 1);
+
+        if (count($arrays) === 1) return self::_wrap($arrays);
+
+        $__ = new self();
+        $return = $__::first($arrays);
+        foreach ($__::rest($arrays) as $item) {
+            $return = array_intersect($return, $item);
+        }
+
+        return self::_wrap($return);
+    }
+
+    /**
+     * 只存在第一个数组中,但是不在其他数组中
+     * @param null $array
+     * @return mixed
+     */
+    public function difference($array = null)
+    {
+        $arrays = self::_wrapArgs(func_get_args(), 1);
+
+        return self::_wrap(array_values(call_user_func_array('array_diff', $arrays)));
+    }
+
+    public function range()
+    {
     }
 
     /**

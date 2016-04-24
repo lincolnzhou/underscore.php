@@ -56,4 +56,63 @@ class ArraysTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals(array(1, 'false'), __::compact($vals));
     }
+
+    public function testFlatten()
+    {
+        $list = array(1, array(2), array(3, array(array(array(4), array(5)))));
+
+        $this->assertEquals(array(1, 2, 3, 4, 5), __::flatten($list), 'can flatten nested array');
+        $this->assertEquals(array(1, 2, 3, array(array(array(4), array(5)))), __::flatten($list, true), 'can flatten nested array');
+    }
+
+    public function testWithout()
+    {
+        $this->assertEquals(array(1 => 2, 2 => 3), __::without(array(1, 2, 3, 4, 5, 5), 1, 4, 5));
+
+        $list = array(
+            (object) array('one'=>1),
+            (object) array('two'=>2)
+        );
+        $this->assertEquals(2, count(__::without($list, (object) array('one'=>1))), 'uses real object identity for comparisons.');
+    }
+
+    public function testUniq()
+    {
+        $this->assertEquals(array(1, 2, 3, 4, 5), __::uniq(array(1, 2, 3, 4, 5, 5)));
+
+        $list = array(
+            (object) array('name'=>'moe'),
+            (object) array('name'=>'curly'),
+            (object) array('name'=>'larry'),
+            (object) array('name'=>'curly')
+        );
+        $iterator = function($value) { return $value->name; };
+        $this->assertEquals(array('moe', 'curly', 'larry'),__::uniq($list, false, $iterator), 'can find the unique values of an array using a custom iterator');
+    }
+
+    public function testUnion()
+    {
+        $this->assertEquals(array(1, 2, 4, 5), __::union(array(1, 2), array(2, 4), array(4, 5)));
+
+        $arr1 = array(1, 2, 3);
+        $arr2 = array(101, 2, 1, 10);
+        $arr3 = array(2, 1);
+        $this->assertEquals(array(1, 2, 3, 101, 10), __::union($arr1, $arr2, $arr3));
+    }
+
+    public function testIntersection()
+    {
+        $arr1 = array(1, 2, 3);
+        $arr2 = array(101, 2, 1, 10);
+        $arr3 = array(2, 1);
+        $this->assertEquals(array(1, 2), __::intersection($arr1, $arr2, $arr3));
+    }
+
+    public function testDifference()
+    {
+        $arr1 = array(1, 2, 3);
+        $arr2 = array(101, 2, 1, 10);
+        $arr3 = array(2, 1);
+        $this->assertEquals(array(3), __::difference($arr1, $arr2, $arr3));
+    }
 }
